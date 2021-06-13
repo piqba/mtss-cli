@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	mtss "github.com/PinchandoEnCuba/mtss-cli/app/mtss/models"
+	mtss "github.com/PinchandoEnCuba/mtss-cli"
 )
 
 type MtssStorage interface {
