@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"time"
 
 	mtss "github.com/piqba/mtss-cli/mtss/cli"
@@ -13,7 +15,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var (
+	cmd = "mtss"
+)
+
 var ctx = context.Background()
+
+func init() {
+	flag.StringVar(&cmd, "fetch", cmd, "--fetch <mtss>")
+	flag.Parse()
+	numcpu := runtime.NumCPU()
+	runtime.GOMAXPROCS(numcpu) // Try to use all available CPUs.
+}
 
 func main() {
 
