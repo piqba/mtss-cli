@@ -1,6 +1,7 @@
 package mtss
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -18,7 +19,11 @@ type MtssService struct {
 func (s *MtssService) fetchMtssJOB(url string) []mtss.MTSS {
 	var mtssArray []mtss.MTSS
 
-	resp, err := http.Get(url)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	resp, err := client.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
