@@ -2,6 +2,7 @@ package mtss
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -33,12 +34,14 @@ func (s *MtssCliService) InsertJobsOneByOneOnRedis(ctx context.Context, url stri
 
 	mtssJobs := s.gtw.FetchMtssJOB(url)
 	for _, job := range mtssJobs {
-		key := fmt.Sprintf("%s:%d", signature, job.ID)
-		value, _ := job.ToMAP()
-		if _, err := s.rdb.HSet(ctx, key, value).Result(); err != nil {
-			log.Fatal("create: redis error: %w", err)
-		}
-		s.rdb.Expire(ctx, key, 24*time.Hour)
+		go func(job models.MTSS) {
+			key := fmt.Sprintf("%s:%d", signature, job.ID)
+			value, _ := job.ToMAP()
+			if _, err := s.rdb.HSet(ctx, key, value).Result(); err != nil {
+				log.Fatal("create: redis error: %w", err)
+			}
+			s.rdb.Expire(ctx, key, 24*time.Hour)
+		}(job)
 	}
 	log.Println("Ingested all jobs: ", len(mtssJobs))
 }
@@ -54,13 +57,18 @@ func (s *MtssCliService) InsertJobsDailyBatchOnRedis(ctx context.Context, url st
 	key := fmt.Sprintf("%s:%s", signature, keySufix)
 
 	mtssJobs := s.gtw.FetchMtssJOB(url)
+	bytes, err := json.Marshal(mtssJobs)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	dcache := models.DailyCache{
 		ID:    keySufix,
-		Jobs:  mtssJobs,
+		Jobs:  string(bytes),
 		Count: len(mtssJobs),
 	}
 
 	value, _ := dcache.ToMAP()
+
 	if _, err := s.rdb.HSet(ctx, key, value).Result(); err != nil {
 		log.Fatal("create: redis error: %w", err)
 	}

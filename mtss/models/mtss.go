@@ -29,7 +29,7 @@ type MTSS struct {
 type DailyCache struct {
 	ID    string `json:"id"`
 	Count int    `json:"count"`
-	Jobs  []MTSS `json:"jobs"`
+	Jobs  string `json:"jobs"`
 }
 
 func (d *DailyCache) MarshalBinary() ([]byte, error) {
