@@ -43,6 +43,16 @@ func (d *DailyCache) UnmarshalBinary(data []byte) error {
 
 	return nil
 }
+func (d *DailyCache) ToMAP() (toHashMap map[string]interface{}, err error) {
+
+	fromStruct, _ := json.Marshal(d)
+	if err := json.Unmarshal(fromStruct, &toHashMap); err != nil {
+		return toHashMap, err
+	}
+
+	return toHashMap, nil
+}
+
 func (mt *MTSS) MarshalBinary() ([]byte, error) {
 	return json.Marshal(mt)
 }
@@ -53,4 +63,16 @@ func (mt *MTSS) UnmarshalBinary(data []byte) error {
 	}
 
 	return nil
+}
+
+func (mt *MTSS) ToMAP() (toHashMap map[string]interface{}, err error) {
+
+	fromStruct, _ := json.Marshal(mt)
+	if err := json.Unmarshal(fromStruct, &toHashMap); err != nil {
+		return toHashMap, err
+	}
+	// 	for field, val := range inInterface {
+	// 		fmt.Println("KV Pair: ", field, val)
+	// }
+	return toHashMap, nil
 }
