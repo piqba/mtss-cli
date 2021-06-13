@@ -1,6 +1,6 @@
 package mtss
 
-import mtss "github.com/PinchandoEnCuba/mtss-cli/app/mtss/models"
+import mtss "github.com/piqba/mtss-cli/mtss/models"
 
 type MtssGateway interface {
 	FetchMtssJOB(url string) []mtss.MTSS

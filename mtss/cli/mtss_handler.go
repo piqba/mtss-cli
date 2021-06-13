@@ -10,8 +10,8 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	gateway "github.com/PinchandoEnCuba/mtss-cli/app/mtss/gateway"
-	models "github.com/PinchandoEnCuba/mtss-cli/app/mtss/models"
+	gateway "github.com/piqba/mtss-cli/mtss/gateway"
+	models "github.com/piqba/mtss-cli/mtss/models"
 )
 
 type MtssCliService struct {

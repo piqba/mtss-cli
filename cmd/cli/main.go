@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	mtss "github.com/PinchandoEnCuba/mtss-cli/mtss/cli"
+	mtss "github.com/piqba/mtss-cli/mtss/cli"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 )
