@@ -24,6 +24,7 @@ func (s *MtssService) fetchMtssJOB(url string) []mtss.MTSS {
 	}
 	client := &http.Client{Transport: tr}
 	resp, err := client.Get(url)
+
 	if err != nil {
 		log.Fatal(err)
 	}
