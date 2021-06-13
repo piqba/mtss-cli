@@ -2,7 +2,6 @@ package mtss
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -13,6 +12,8 @@ import (
 	gateway "github.com/piqba/mtss-cli/mtss/gateway"
 	models "github.com/piqba/mtss-cli/mtss/models"
 )
+
+var signature = "mtss:job"
 
 type MtssCliService struct {
 	gtw gateway.MtssGateway
@@ -26,38 +27,43 @@ func NewMtssCliService(rdb *redis.Client) *MtssCliService {
 	}
 }
 
-func (s *MtssCliService) FetchMtssJOBHandler(ctx context.Context, url string) {
-	currentTime := time.Now()
-	keyField := strings.Split(currentTime.String(), " ")[0]
-	mtssKey := fmt.Sprintf("mtss:%s", keyField)
+// InsertJobsOneByOneOnRedis it`s used for insert simple hash on redis
+// redis command [hset key field1 value1 ...]
+func (s *MtssCliService) InsertJobsOneByOneOnRedis(ctx context.Context, url string) {
 
-	result, err := s.rdb.HGet(ctx, mtssKey, keyField).Result()
-	if err != nil && err != redis.Nil {
-		log.Fatal("find: redis error: %w", err)
-	}
-	if result == "" {
-
-		mtssJobs := s.gtw.FetchMtssJOB(url)
-		dcache := models.DailyCache{
-			ID:    keyField,
-			Jobs:  mtssJobs,
-			Count: len(mtssJobs),
-		}
-		bytes, err := json.Marshal(dcache)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if _, err := s.rdb.HSetNX(ctx, mtssKey, keyField, string(bytes)).Result(); err != nil {
+	mtssJobs := s.gtw.FetchMtssJOB(url)
+	for _, job := range mtssJobs {
+		key := fmt.Sprintf("%s:%d", signature, job.ID)
+		value, _ := job.ToMAP()
+		if _, err := s.rdb.HSet(ctx, key, value).Result(); err != nil {
 			log.Fatal("create: redis error: %w", err)
 		}
-		s.rdb.Expire(ctx, mtssKey, 24*time.Hour)
-	} else {
-
-		dcache := models.DailyCache{}
-		if err := dcache.UnmarshalBinary([]byte(result)); err != nil {
-			log.Fatal("find: unmarshal error: %w", err)
-		}
-		fmt.Println(dcache.Count)
+		s.rdb.Expire(ctx, key, 24*time.Hour)
 	}
+	log.Println("Ingested all jobs: ", len(mtssJobs))
+}
+
+func (s *MtssCliService) InsertJobsDailyBatchOnRedis(ctx context.Context, url string) {
+	currentTime := time.Now()
+	date := strings.Split(currentTime.String(), " ")[0]
+	keySufix := strings.ReplaceAll(
+		date,
+		"-",
+		"",
+	)
+	key := fmt.Sprintf("%s:%s", signature, keySufix)
+
+	mtssJobs := s.gtw.FetchMtssJOB(url)
+	dcache := models.DailyCache{
+		ID:    keySufix,
+		Jobs:  mtssJobs,
+		Count: len(mtssJobs),
+	}
+
+	value, _ := dcache.ToMAP()
+	if _, err := s.rdb.HSet(ctx, key, value).Result(); err != nil {
+		log.Fatal("create: redis error: %w", err)
+	}
+	s.rdb.Expire(ctx, key, 24*time.Hour)
 
 }
