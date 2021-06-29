@@ -2,18 +2,19 @@ package cli
 
 import (
 	"flag"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/piqba/mtss-cli/internal"
 	mtssDomain "github.com/piqba/mtss-cli/mtss/domain"
 	mtssHandler "github.com/piqba/mtss-cli/mtss/handlers"
 	mtssService "github.com/piqba/mtss-cli/mtss/service"
 )
 
 var (
-	engine = "mongo"
-	limit  = 10
+	engine     = "mongo"
+	limit      = 10
+	ErrLoadEnv = internal.NewError("dotenv: Error loading .env file")
 )
 
 func init() {
@@ -24,7 +25,7 @@ func init() {
 func Start() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		internal.LogError(ErrLoadEnv.Error())
 	}
 	endpointURI := os.Getenv("ENDPOINT_MTSS")
 	var mtssRepository mtssDomain.MtssRepository

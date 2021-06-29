@@ -2,13 +2,19 @@ package cli
 
 import (
 	"context"
-	"log"
 	"os"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/piqba/mtss-cli/internal"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+var (
+	ErrMongoDbConnection = internal.NewError("Mongo: Fail to connection")
+	ErrMongoDbCheckConn  = internal.NewError("Mongo: Fail to check connection")
+	ErrRedisDbCheckConn  = internal.NewError("Redis: Fail to check connection")
 )
 
 func GetMongoDbClient() *mongo.Client {
@@ -18,13 +24,13 @@ func GetMongoDbClient() *mongo.Client {
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
-		log.Println(err)
+		internal.LogError(ErrMongoDbConnection.Error())
 
 	}
 	// Check the connection
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Println(err)
+		internal.LogError(ErrMongoDbCheckConn.Error())
 	}
 	clientInstance = client
 	return clientInstance
@@ -43,7 +49,7 @@ func GetRedisDbClient() *redis.Client {
 
 	_, err := clientInstance.Ping(context.TODO()).Result()
 	if err != nil {
-		log.Fatal("Redis down " + err.Error())
+		internal.LogError(ErrRedisDbCheckConn.Error())
 	}
 	return clientInstance
 }
