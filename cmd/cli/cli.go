@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -10,11 +11,16 @@ import (
 	mtssService "github.com/piqba/mtss-cli/mtss/service"
 )
 
-// func init(){
-// 	// 	flag.StringVar(&source, "source", source, "--source <mtss> Data source to ingest on DB")
-// // 	flag.BoolVar(&batch, "batch", batch, "--batch <true> For fetch daily jobs or one by one jobs")
-// // 	flag.Parse()
-// }
+var (
+	engine = "mongo"
+	limit  = 10
+)
+
+func init() {
+	flag.StringVar(&engine, "engine", engine, "--engine <mongo> Data engine to ingest on DB")
+	flag.IntVar(&limit, "limit", limit, "--limit <10> Data limit to ingest on DB")
+	flag.Parse()
+}
 func Start() {
 	err := godotenv.Load()
 	if err != nil {
@@ -22,8 +28,6 @@ func Start() {
 	}
 	endpointURI := os.Getenv("ENDPOINT_MTSS")
 	var mtssRepository mtssDomain.MtssRepository
-	// pass to flag
-	var engine = "mongo"
 
 	switch engine {
 	case "all":
@@ -52,6 +56,6 @@ func Start() {
 		Service: mtssService.NewCustomerService(mtssRepository),
 	}
 
-	mh.InsertOnDbFromAPI("mongo", endpointURI, 2)
+	mh.InsertOnDbFromAPI("mongo", endpointURI, limit)
 
 }
