@@ -56,6 +56,6 @@ func Start() {
 		Service: mtssService.NewCustomerService(mtssRepository),
 	}
 
-	mh.InsertOnDbFromAPI("mongo", endpointURI, limit)
+	mh.InsertOnDbFromAPI(engine, endpointURI, limit)
 
 }
