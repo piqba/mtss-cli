@@ -34,20 +34,20 @@ func Start() {
 	case "all":
 		mongoDbClient := GetMongoDbClient()
 		redisDbClient := GetRedisDbClient()
-		mtssRepository = mtssDomain.NewMtssRepositoryAll(
+		mtssRepository = mtssDomain.NewMtssRepository(
 			endpointURI,
 			mongoDbClient,
 			redisDbClient,
 		)
 	case "mongo":
 		mongoDbClient := GetMongoDbClient()
-		mtssRepository = mtssDomain.NewMtssRepositoryWithOutRedis(
+		mtssRepository = mtssDomain.NewMtssRepository(
 			endpointURI,
 			mongoDbClient,
 		)
 	case "redis":
 		redisDbClient := GetRedisDbClient()
-		mtssRepository = mtssDomain.NewMtssRepositoryWithOutMongo(
+		mtssRepository = mtssDomain.NewMtssRepository(
 			endpointURI,
 			redisDbClient,
 		)

@@ -25,29 +25,17 @@ type MtssRepositoryAPI struct {
 	clientRdb *redis.Client
 }
 
-func NewMtssRepositoryAPI(url string) MtssRepositoryAPI {
-
-	return MtssRepositoryAPI{}
-}
-
-func NewMtssRepositoryAll(url string, clientMgo *mongo.Client, clientRdb *redis.Client) MtssRepositoryAPI {
-
-	return MtssRepositoryAPI{
-		clientMgo: clientMgo,
-		clientRdb: clientRdb,
+func NewMtssRepository(url string, clients ...interface{}) MtssRepositoryAPI {
+	var mtssRepositoryAPI MtssRepositoryAPI
+	for _, c := range clients {
+		switch c.(type) {
+		case *mongo.Client:
+			mtssRepositoryAPI.clientMgo = c.(*mongo.Client)
+		case *redis.Client:
+			mtssRepositoryAPI.clientRdb = c.(*redis.Client)
+		}
 	}
-}
-func NewMtssRepositoryWithOutRedis(url string, clientMgo *mongo.Client) MtssRepositoryAPI {
-
-	return MtssRepositoryAPI{
-		clientMgo: clientMgo,
-	}
-}
-func NewMtssRepositoryWithOutMongo(url string, clientRdb *redis.Client) MtssRepositoryAPI {
-
-	return MtssRepositoryAPI{
-		clientRdb: clientRdb,
-	}
+	return mtssRepositoryAPI
 }
 
 func (m MtssRepositoryAPI) FetchAllFromAPI(url string) ([]MTSS, error) {
