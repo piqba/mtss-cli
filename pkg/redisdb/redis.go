@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/piqba/mtss-cli/pkg/logger"
 	"github.com/piqba/mtss-go/pkg/errors"
-	"github.com/piqba/mtss-go/pkg/logger"
 )
 
 var (

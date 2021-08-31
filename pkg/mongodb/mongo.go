@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/piqba/mtss-cli/pkg/logger"
 	"github.com/piqba/mtss-go/pkg/errors"
-	"github.com/piqba/mtss-go/pkg/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
