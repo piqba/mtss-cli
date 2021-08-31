@@ -2,15 +2,12 @@ package mtss
 
 import (
 	"context"
-	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	mtssgo "github.com/piqba/mtss-go"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -20,61 +17,43 @@ const (
 	SIGANTURE = "mtss:job"
 )
 
-type MtssRepositoryAPI struct {
+type MtssRepository struct {
 	clientMgo *mongo.Client
 	clientRdb *redis.Client
 }
 
-func NewMtssRepository(url string, clients ...interface{}) MtssRepositoryAPI {
-	var mtssRepositoryAPI MtssRepositoryAPI
+func NewMtssRepository(clients ...interface{}) MtssRepository {
+	var mtssrepo MtssRepository
 	for _, c := range clients {
-		switch c.(type) {
+		switch c := c.(type) {
 		case *mongo.Client:
-			mtssRepositoryAPI.clientMgo = c.(*mongo.Client)
+			mtssrepo.clientMgo = c
 		case *redis.Client:
-			mtssRepositoryAPI.clientRdb = c.(*redis.Client)
+			mtssrepo.clientRdb = c
 		}
 	}
-	return mtssRepositoryAPI
+	return mtssrepo
 }
 
-func (m MtssRepositoryAPI) FetchAllFromAPI(url string) ([]MTSS, error) {
-
-	var mtssArray []MTSS
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
-	resp, err := client.Get(url)
-
+func (m MtssRepository) FetchAllFromAPI(limit int32) ([]mtssgo.Mtss, error) {
+	baseURL := mtssgo.URL_BASE
+	skipVerify := true
+	client := mtssgo.NewClient(
+		baseURL,
+		skipVerify,
+		nil, //custom http client, defaults to http.DefaultClient
+		nil, //io.Writer (os.Stdout) to output debug messages
+	)
+	jobs, err := client.GetMtssJobs(context.TODO())
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	defer func() {
-		err := resp.Body.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
+		log.Fatalf(err.Error())
 	}
 
-	err = json.Unmarshal(body, &mtssArray)
-	if err != nil {
-		log.Fatal("Unmarshal", err)
-		return nil, err
-	}
-
-	return mtssArray, nil
+	return jobs[:limit], nil
 }
 
 //CreateOne - Insert a new document in the collection.
-func (m MtssRepositoryAPI) CreateOne(engine string, mtss MTSS) error {
+func (m MtssRepository) CreateOne(engine string, mtss mtssgo.Mtss) error {
 
 	switch engine {
 	case "redis":
