@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	mtssgo "github.com/piqba/mtss-go"
+	"github.com/piqba/mtss-go"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -35,16 +35,16 @@ func NewMtssRepository(clients ...interface{}) MtssRepository {
 	return mtssrepo
 }
 
-func (m MtssRepository) FetchAllFromAPI(limit int32) ([]mtssgo.Mtss, error) {
-	baseURL := mtssgo.URL_BASE
+func (m MtssRepository) FetchAllFromAPI(limit int32) ([]mtss.Mtss, error) {
+	baseURL := mtss.URL_BASE
 	skipVerify := true
-	client := mtssgo.NewClient(
+	client := mtss.NewAPIClient(
 		baseURL,
 		skipVerify,
 		nil, //custom http client, defaults to http.DefaultClient
 		nil, //io.Writer (os.Stdout) to output debug messages
 	)
-	jobs, err := client.GetMtssJobs(context.TODO())
+	jobs, err := client.MtssJobs(context.TODO())
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
@@ -53,12 +53,12 @@ func (m MtssRepository) FetchAllFromAPI(limit int32) ([]mtssgo.Mtss, error) {
 }
 
 //CreateOne - Insert a new document in the collection.
-func (m MtssRepository) CreateOne(engine string, mtss mtssgo.Mtss) error {
+func (m MtssRepository) CreateOne(engine string, job mtss.Mtss) error {
 
 	switch engine {
 	case "redis":
-		key := fmt.Sprintf("%s:%d", SIGANTURE, mtss.ID)
-		value, _ := mtss.ToMAP()
+		key := fmt.Sprintf("%s:%d", SIGANTURE, job.ID)
+		value, _ := job.ToMAP()
 		if _, err := m.clientRdb.HSet(context.TODO(), key, value).Result(); err != nil {
 			log.Fatal("create: redis error: %w", err)
 		}
@@ -67,7 +67,7 @@ func (m MtssRepository) CreateOne(engine string, mtss mtssgo.Mtss) error {
 		//Create a handle to the respective collection in the database.
 		collection := m.clientMgo.Database(DB).Collection(JOBS)
 		//Perform InsertOne operation & validate against the error.
-		_, err := collection.InsertOne(context.TODO(), mtss)
+		_, err := collection.InsertOne(context.TODO(), job)
 		if err != nil {
 			return err
 		}

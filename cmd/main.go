@@ -5,7 +5,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/piqba/mtss-cli/cmd/cli"
-	"github.com/piqba/mtss-go/pkg/logger"
+	"github.com/piqba/mtss-cli/pkg/logger"
 )
 
 func init() {
