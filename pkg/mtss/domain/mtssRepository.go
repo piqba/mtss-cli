@@ -74,3 +74,15 @@ func (m MtssRepository) CreateOne(engine string, job mtss.Mtss) error {
 	}
 	return nil
 }
+
+func (m MtssRepository) SendDataToRedisStream(rdb *redis.Client, key string, value map[string]interface{}) error {
+
+	err := rdb.XAdd(context.TODO(), &redis.XAddArgs{
+		Stream: key,
+		Values: value,
+	}).Err()
+	if err != nil {
+		return err
+	}
+	return nil
+}
