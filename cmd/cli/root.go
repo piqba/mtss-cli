@@ -11,6 +11,7 @@ const (
 	flagLimit  = "limit"
 	flagEngine = "engine"
 	REDIS      = "redis"
+	POSTGRESQL = "postgres"
 	MONGODB    = "mongodb"
 	ALL        = "all"
 )
