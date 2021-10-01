@@ -82,7 +82,7 @@ func (m MtssRepository) CreateOne(engine string, job mtss.Mtss) error {
 		}
 	case POSTGRESQL:
 		tx := m.clientPgx.MustBegin()
-		query := "INSERT INTO mtss_jobs (id, created_at, job) VALUES ($1, $2, $3)"
+		query := "INSERT INTO mtss_jobs (id, created_at, job) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING"
 		jobToJSON, err := json.Marshal(job)
 		if err != nil {
 			logger.LogError(err.Error())
