@@ -9,4 +9,5 @@ type Mtsser interface {
 	FetchAllFromAPI(int32) ([]mtss.Mtss, error)
 	CreateOne(string, mtss.Mtss) error
 	SendDataStream(rdb *redis.Client, key string, value map[string]interface{}) error
+	GetMtssJobs() ([]mtss.Mtss, error)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/piqba/mtss-cli/pkg/constants"
 	"github.com/piqba/mtss-cli/pkg/logger"
 	mdomain "github.com/piqba/mtss-cli/pkg/mtss/domain"
 	mhandler "github.com/piqba/mtss-cli/pkg/mtss/handlers"
@@ -12,16 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	schema = `
-	CREATE TABLE IF NOT EXISTS mtss_jobs
-	(
-		id         int PRIMARY KEY        NOT NULL,
-		created_at TIMESTAMP DEFAULT now() NOT NULL,
-		job  JSON
-	);
-	`
-)
 var insertCmd = &cobra.Command{
 	Use:   "insert",
 	Short: "Fetch data from API rest client to an specific db (redis/mongodb[unimplemented]/postgresql)",
@@ -47,7 +38,7 @@ var insertCmd = &cobra.Command{
 			if err != nil {
 				logger.LogError(err.Error())
 			}
-			pgxDbclient.MustExec(schema)
+			pgxDbclient.MustExec(constants.SchemaMTTS)
 
 			mrepo := mdomain.NewMtssRepository(pgxDbclient)
 			ms := mservice.NewCustomerService(mrepo)

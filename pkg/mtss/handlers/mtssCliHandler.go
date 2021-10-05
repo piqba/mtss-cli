@@ -32,3 +32,7 @@ func (mh *MtssHandler) InsertOnDbFromAPI(engine string, limit int32) {
 	}
 	fmt.Println("OK")
 }
+func (mh *MtssHandler) GetMtssJobs(engine string, limit int32) {
+
+	fmt.Println("TODO")
+}

@@ -2,12 +2,14 @@ package mtss
 
 import (
 	domain "github.com/piqba/mtss-cli/pkg/mtss/domain"
+	"github.com/piqba/mtss-go"
 	mtssgo "github.com/piqba/mtss-go"
 )
 
 type MtssService interface {
 	FetchAllFromAPI(limit int32) ([]mtssgo.Mtss, error)
 	InsertOnDbFromAPI(string, int32) error
+	GetMtssJobs() ([]mtss.Mtss, error)
 }
 
 type DefaultMtssService struct {
@@ -37,4 +39,11 @@ func (s DefaultMtssService) InsertOnDbFromAPI(engine string, limit int32) error 
 		}
 	}
 	return nil
+}
+func (s DefaultMtssService) GetMtssJobs() ([]mtss.Mtss, error) {
+	mtssJobs, err := s.repo.GetMtssJobs()
+	if err != nil {
+		return nil, err
+	}
+	return mtssJobs, nil
 }

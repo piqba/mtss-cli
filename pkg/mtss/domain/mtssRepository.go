@@ -109,3 +109,22 @@ func (m MtssRepository) SendDataToRedisStream(rdb *redis.Client, key string, val
 	}
 	return nil
 }
+
+func (m MtssRepository) GetMtssJobs() ([]mtss.Mtss, error) {
+	var jobs []mtss.Mtss
+	rows, err := m.clientPgx.Queryx("select job from mtss_jobs limit 2;")
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var data []byte
+		var job mtss.Mtss
+		err = rows.Scan(&data)
+		json.Unmarshal(data, &job)
+		if err != nil {
+			return nil, err
+		}
+		jobs = append(jobs, job)
+	}
+	return jobs, nil
+}
