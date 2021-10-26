@@ -9,7 +9,7 @@ import (
 type MtssService interface {
 	FetchAllFromAPI(limit int32) ([]mtssgo.Mtss, error)
 	InsertOnDbFromAPI(string, int32) error
-	GetMtssJobs() ([]mtss.Mtss, error)
+	GetMtssJobs(limit, offset int) ([]mtss.Mtss, error)
 }
 
 type DefaultMtssService struct {
@@ -32,16 +32,26 @@ func (s DefaultMtssService) InsertOnDbFromAPI(engine string, limit int32) error 
 	if err != nil {
 		return err
 	}
-	for _, job := range mtssJobs[0:limit] {
-		err := s.repo.CreateOne(engine, job)
-		if err != nil {
-			return err
+	if limit == 0 {
+		for _, job := range mtssJobs {
+			err := s.repo.CreateOne(engine, job)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+
+		for _, job := range mtssJobs[0:limit] {
+			err := s.repo.CreateOne(engine, job)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
-func (s DefaultMtssService) GetMtssJobs() ([]mtss.Mtss, error) {
-	mtssJobs, err := s.repo.GetMtssJobs()
+func (s DefaultMtssService) GetMtssJobs(limit, offset int) ([]mtss.Mtss, error) {
+	mtssJobs, err := s.repo.GetMtssJobs(limit, offset)
 	if err != nil {
 		return nil, err
 	}
