@@ -22,6 +22,7 @@ func (mh *MtssHandler) FetchAllFromAPI(limit int32) {
 	if err != nil {
 		log.Println(err)
 	}
+
 	fmt.Println(data)
 }
 
