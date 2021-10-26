@@ -57,8 +57,12 @@ func (m MtssRepository) FetchAllFromAPI(limit int32) ([]mtss.Mtss, error) {
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
+	if limit > 0 {
 
-	return jobs[:limit], nil
+		return jobs[:limit], nil
+	}
+	return jobs, nil
+
 }
 
 //CreateOne - Insert a new document in the collection.
@@ -110,9 +114,16 @@ func (m MtssRepository) SendDataToRedisStream(rdb *redis.Client, key string, val
 	return nil
 }
 
-func (m MtssRepository) GetMtssJobs() ([]mtss.Mtss, error) {
+func (m MtssRepository) GetMtssJobs(limit, offset int) ([]mtss.Mtss, error) {
 	var jobs []mtss.Mtss
-	rows, err := m.clientPgx.Queryx("select job from mtss_jobs limit 2;")
+	query := ""
+	if limit == 0 && offset == 0 {
+
+		query = "select job from mtss_jobs"
+	} else {
+		query = fmt.Sprintf("select job from mtss_jobs limit %d offset %d;", limit, offset)
+	}
+	rows, err := m.clientPgx.Queryx(query)
 	if err != nil {
 		return nil, err
 	}
