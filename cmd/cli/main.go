@@ -4,6 +4,7 @@ import (
 	"runtime"
 
 	"github.com/joho/godotenv"
+	"github.com/piqba/mtss-cli/cmd/cli/commands"
 	"github.com/piqba/mtss-cli/pkg/logger"
 )
 
@@ -17,5 +18,5 @@ func init() {
 }
 
 func main() {
-	Execute()
+	commands.Execute()
 }

@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -25,7 +25,6 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		//TODO change this with tomatto-logger
 		fmt.Println(err)
 		os.Exit(1)
 	}

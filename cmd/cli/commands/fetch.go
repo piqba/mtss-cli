@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"log"
@@ -22,11 +22,12 @@ var fetchCmd = &cobra.Command{
 		ms := mservice.NewCustomerService(mrepo)
 		mhs := mhandler.NewMtssHandler(ms)
 		mhs.FetchAllFromAPI(limit)
+
 	},
 }
 
 func init() {
-	fetchCmd.Flags().Int32(flagLimit, 10, "select a limit of jobs to fetch")
+	fetchCmd.Flags().Int32(flagLimit, 0, "select a limit of jobs to fetch")
 	rootCmd.AddCommand(fetchCmd)
 
 }

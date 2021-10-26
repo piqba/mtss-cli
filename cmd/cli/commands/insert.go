@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"log"
@@ -50,7 +50,7 @@ var insertCmd = &cobra.Command{
 
 func init() {
 	insertCmd.Flags().String(flagEngine, "postgres", "select a engine for insert data")
-	insertCmd.Flags().Int32(flagLimit, 10, "select a limit of jobs to fetch")
+	insertCmd.Flags().Int32(flagLimit, 0, "select a limit of jobs to fetch")
 
 	rootCmd.AddCommand(insertCmd)
 
