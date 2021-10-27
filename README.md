@@ -31,3 +31,12 @@ create database mtss;
 # select elements using json properties
 select id,job->'organismo' as entity from mtss_jobs limit 2;
 ```
+
+Docker Build image
+
+```bash
+#build
+podman build --tag piqba/mtssapi-v0.1.0 -f Dockerfile.multistage .
+#run on host network
+podman run --network=host  localhost/piqba/mtssapi-v0.1.0
+```
