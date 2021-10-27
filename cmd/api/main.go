@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,5 +39,6 @@ func main() {
 	h := mhandler.New(ms)
 	app.Get("/mtss/jobs", h.GetMtssJobs)
 
-	logger.LogError(app.Listen(":3000").Error())
+	port := fmt.Sprintf(":%v", os.Getenv("PORT"))
+	logger.LogError(app.Listen(port).Error())
 }
