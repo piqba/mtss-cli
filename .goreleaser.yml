@@ -10,6 +10,33 @@ builds:
   -
     # ID of the build.
     # Defaults to the project name.
+    id: "mtssapi"
+
+    # Path to project's (sub)directory containing Go code.
+    # This is the working directory for the Go build command(s).
+    # Default is `.`.
+    # dir: go
+
+    # Path to main.go file or main package.
+    # Notice: when used with `gomod.proxy`, this must be a package.
+    #
+    # Default is `.`.
+    main: ./cmd/api
+
+    # Binary name.
+    # Can be a path (e.g. `bin/app`) to wrap the binary in a directory.
+    # Default is the name of the project directory.
+    binary: mtssapi
+
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+  -
+    # ID of the build.
+    # Defaults to the project name.
     id: "mtss"
 
     # Path to project's (sub)directory containing Go code.
